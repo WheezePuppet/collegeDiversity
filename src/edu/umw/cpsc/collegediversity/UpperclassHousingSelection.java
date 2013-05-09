@@ -6,7 +6,7 @@ import ec.util.*;
 
 
 /**
- * A Singleton class that can {@link assign} a set of {@link
+ * A Singleton class that can {@link #assign} a set of {@link
  * Student}s to their non-freshmen dorms. The students in question are all
  * those <i>except</i> incoming freshmen. 
  * @see FreshmanHousingSelection
@@ -70,7 +70,7 @@ public class UpperclassHousingSelection{
     /** 
      * Assign the set of students (presumably non-incoming-freshmen, but
      * this is not checked) passed to their dorm rooms, in a way that does 
-     * not take race into account. (compare {@link assignByRace}.) As a 
+     * not take race into account. (compare {@link #assignByRace}.) As a 
      * precursor (side effect) to this, any students already existing in 
      * upperclass dorms will be removed.
      */
@@ -135,7 +135,7 @@ public class UpperclassHousingSelection{
     /** 
      * Assign the set of students (presumably non-incoming-freshmen, but 
      * this is not checked) students passed to their dorm rooms, in a way 
-     * that <i>does</i> take race into account. (compare {@link assign}.)
+     * that <i>does</i> take race into account. (compare {@link #assign}.)
      * Minorities will have a higher probability of rooming with other
      * minorities than they would otherwise have had. As a precursor (side 
      * effect) to this, any students already existing in upperclass dorms

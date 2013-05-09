@@ -73,7 +73,7 @@ public class Sim extends SimState implements Steppable {
     public static boolean HOUSING_BY_RACE = false;
 
     /**
-     * If {@link HOUSING_BY_RACE} is true, the probability that a minority
+     * If {@link #HOUSING_BY_RACE} is true, the probability that a minority
      * student will be assigned a minority roommate. (Strictly speaking
      * this isn't quite true, since if minority student A passes this dice
      * roll, and is assigned minority student B as a roommate, then student

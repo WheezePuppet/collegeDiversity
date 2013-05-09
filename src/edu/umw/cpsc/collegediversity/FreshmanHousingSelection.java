@@ -5,7 +5,7 @@ import sim.util.*;
 import ec.util.*;
 
 /**
- * A Singleton class that can {@link assign} a set of freshman {@link
+ * A Singleton class that can {@link #assign} a set of freshman {@link
  * Student}s to their freshman dorms. 
  * @see UpperclassHousingSelection
  */
@@ -49,7 +49,7 @@ public class FreshmanHousingSelection{
     /** 
      * Assign the set of (presumably freshman, but this is not checked)
      * students passed to their freshman dorm rooms, in a way that does not
-     * take race into account. (compare {@link assignByRace}.) As a precursor
+     * take race into account. (compare {@link #assignByRace}.) As a precursor
      * (side effect) to this, any freshmen already existing in freshmen dorms
      * will be removed.
      */
@@ -93,7 +93,7 @@ public class FreshmanHousingSelection{
     /** 
      * Assign the set of (presumably freshman, but this is not checked)
      * students passed to their freshman dorm rooms, in a way that
-     * <i>does</i> take race into account. (compare {@link assign}.)
+     * <i>does</i> take race into account. (compare {@link #assign}.)
      * Minorities will have a higher probability of rooming with other
      * minorities than they would otherwise have had. As a precursor (side 
      * effect) to this, any freshmen already existing in freshmen dorms

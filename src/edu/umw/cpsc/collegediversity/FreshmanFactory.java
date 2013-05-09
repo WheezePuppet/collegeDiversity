@@ -30,7 +30,7 @@ public final class FreshmanFactory implements Steppable {
     }
 
     /**
-     * Instantiate a new crop of {@link Sim.FRESHMAN_CLASS_SIZE} freshmen,
+     * Instantiate a new crop of {@link Sim#FRESHMAN_CLASS_SIZE} freshmen,
      * and add them to the simulation. This will run every Aug 1st. In 
      * particular:
      * <ul>
