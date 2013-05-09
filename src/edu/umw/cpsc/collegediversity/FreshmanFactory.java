@@ -44,13 +44,10 @@ public final class FreshmanFactory implements Steppable {
      */
     public void step(SimState state) {
 
-System.out.println("* FreshmanFactory");
-System.out.println("clearing O groups...");
         Sim.instance().clearOGroups();
 
         Bag freshmen = new Bag();
 
-System.out.println("instantiating freshmen...");
         for(int i = 0; i < Sim.FRESHMAN_CLASS_SIZE; i++){
             Student.Race race;
             Student.Gender gender;
@@ -88,13 +85,10 @@ System.out.println("instantiating freshmen...");
         if(Sim.instance().HOUSING_BY_RACE){
             FreshmanHousingSelection.instance().assignByRace(freshmen);
         } else {
-System.out.println("assigning freshmen to dorms...");
             FreshmanHousingSelection.instance().assign(freshmen);
         }
-System.out.println("adding freshmen to Sim...");
         Sim.instance().addStudents(freshmen);
 
-System.out.println("scheduling FreshmanFactory for next year!");
         state.schedule.scheduleOnceIn(1, this);
     }
 

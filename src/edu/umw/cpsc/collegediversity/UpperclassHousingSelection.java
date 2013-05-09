@@ -80,11 +80,15 @@ public class UpperclassHousingSelection{
 
         // Purge all freshmen. (We're not assigning those.)
         Bag upperclassmen = null;
-        try { upperclassmen = (Bag) students.clone(); } catch (Exception e) { e.printStackTrace(); System.exit(1); }
+        try { 
+            upperclassmen = (Bag) students.clone(); 
+        } catch (Exception e) { 
+            e.printStackTrace(); 
+            System.exit(1); 
+        }
         for(int x=upperclassmen.size()-1; x>=0; x--){
             Student s = (Student) upperclassmen.get(x);
             if (s.getGrade() < 2) {
-System.out.println("    (removing " + s.getId() + ")");
                 upperclassmen.remove(s);
             }
         }
@@ -125,9 +129,6 @@ System.out.println("    (removing " + s.getId() + ")");
             if(!s.hasRoom()){
                 System.out.println(s + " has no upperclass dorm room!");
             }
-else {
-System.out.println(s + " in dorm " + s.getDormRoom() + ".");
-}
         }
     }
 
