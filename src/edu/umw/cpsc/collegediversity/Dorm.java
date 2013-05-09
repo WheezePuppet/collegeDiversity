@@ -17,7 +17,7 @@ public class Dorm extends Group {
     /**
      * TODO ????
      */
-    public static double CHANCE_DUAL_MINORITY = .00;
+    public static final double CHANCE_DUAL_MINORITY = .00;
 
     /**
      * Constructor for new Dorm objects.

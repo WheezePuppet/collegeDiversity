@@ -21,7 +21,7 @@ import java.io.*;
  * scheduled by the {@link FreshmanFactory} to run the first Sept., and
  * then each year they schedule themselves again for following Sept. unless
  * they graduate or dropout.)</li>
- * <li>This object itself will run once per year, on May 1st, promoting all
+ * <li>This object itself will run once per year, on June 1st, promoting all
  * students who haven't dropped out, and assigning them to next year's
  * dorms.</li>
  * </ul>
@@ -80,7 +80,7 @@ public class Sim extends SimState implements Steppable {
      * B is already allocated a roommate (student A) and therefore won't
      * face this dice roll.)
      */
-    public static final double CHANCE_DUAL_MINORITY=.4;
+    public static final double PROB_DUAL_MINORITY=.4;
 
     /**
      * The name of the output directory into which statistical files
@@ -138,7 +138,7 @@ public class Sim extends SimState implements Steppable {
     private static Sim theInstance;
     private int academicYear = 2013;
 
-    private Bag students = new Bag();
+    private Bag enrolledStudents;
     private OrientationGroup[] oGroups;
     private Student[][] courseRoster;
 
@@ -155,7 +155,9 @@ public class Sim extends SimState implements Steppable {
     }
 
     private Sim(){
-        super(0);
+        super(1);
+
+        enrolledStudents = new Bag();
 
         oGroups = new OrientationGroup[
             (int)Math.ceil(((double)FRESHMAN_CLASS_SIZE)/OGROUP_SIZE)];
@@ -171,11 +173,11 @@ public class Sim extends SimState implements Steppable {
      * simulation.
      */
     public void addStudents(Bag newStudents) {
-        students.addAll(newStudents);
+        enrolledStudents.addAll(newStudents);
     }
 
     void removeMe(Student s) {
-        students.remove(s);
+        enrolledStudents.remove(s);
     }
 
     /**
@@ -214,7 +216,9 @@ public class Sim extends SimState implements Steppable {
 
     private void createAndEmptyOutputDir() {
         File dir = new File(OUTPUT_DIRECTORY);
-        dir.mkdir();
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
         String[] outputFiles;
         if(dir.isDirectory()){
             outputFiles = dir.list();  
@@ -244,24 +248,36 @@ public class Sim extends SimState implements Steppable {
         // Schedule the FreshmanFactory to run each August 1st.
         schedule.scheduleOnce(Schedule.EPOCH + 1, FreshmanFactory.instance());
 
-        // Schedule this simulation object to run each May 1st.
-        schedule.scheduleOnce(Schedule.EPOCH + 9/12.0,this);
+        // Schedule this simulation object to run each June 1st, starting
+        //  with *next* June.
+        schedule.scheduleOnce(Schedule.EPOCH + 1 + 10/12.0,this);
     }
 
     /**
      * Perform year-end maintenance on the simulation. This will occur
-     * every May 1st. In particular:
+     * every June 1st. In particular:
      * <ul>
      * <li>Assign all upperclassmen to dorms.</li>
+     * <li>Print statistical output.</li>
      * <li>Increment the academic year.</li>
      * </ul>
      */
     public void step(SimState state) {
         System.out.println("Year "+academicYear+"-"+(academicYear+1) +
             " completed!!!");
-        UpperclassHousingSelection.instance().assign(students);
-        state.schedule.scheduleOnceIn(1,this);
+        UpperclassHousingSelection.instance().assign(enrolledStudents);
         academicYear++;
+        try{
+            PrintWriter out = new PrintWriter(new FileWriter(
+                OUTPUT_DIRECTORY + File.separator + "year" + 
+                getYear() + ".csv", true)); 
+            int numStudents = enrolledStudents.size();
+            for (int i=0; i<numStudents; i++) {
+                out.println(enrolledStudents.get(i)); 
+            }
+            out.close();
+        }catch(java.io.IOException e){ e.printStackTrace();}
+        state.schedule.scheduleOnceIn(1,this);
     }
 
     /**
@@ -278,7 +294,8 @@ public class Sim extends SimState implements Steppable {
      * body.
      */
     public Student getRandomStudent() {
-        return (Student) students.get(random.nextInt(students.size()));
+        return (Student) enrolledStudents.get(
+            random.nextInt(enrolledStudents.size()));
     }
 
     /**
@@ -286,7 +303,7 @@ public class Sim extends SimState implements Steppable {
      * (matriculated, but neither graduated nor dropped out.)
      */
     public int getNumStudents() {
-        return students.size();
+        return enrolledStudents.size();
     }
 
     /**

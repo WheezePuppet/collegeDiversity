@@ -13,12 +13,8 @@ import ec.util.*;
  */
 public class UpperclassHousingSelection{
 
-    Bag dorms;
+    private Bag dorms;
     private static UpperclassHousingSelection theInstance;
-    private final double CHANCE_DUAL_MINORITY=.4;
-    static MersenneTwisterFast random = new MersenneTwisterFast();
-
-    Scanner sc = new Scanner(System.in); //only for error checking
 
     private UpperclassHousingSelection(){
 
@@ -83,13 +79,15 @@ public class UpperclassHousingSelection{
         emptyDorms();
 
         // Purge all freshmen. (We're not assigning those.)
-        for(int x=students.size()-1; x>=0; x--){
-            Student s = (Student) students.get(x);
+        Bag upperclassmen = null;
+        try { upperclassmen = (Bag) students.clone(); } catch (Exception e) { e.printStackTrace(); System.exit(1); }
+        for(int x=upperclassmen.size()-1; x>=0; x--){
+            Student s = (Student) upperclassmen.get(x);
             if (s.getGrade() < 2) {
-                students.remove(s);
+System.out.println("    (removing " + s.getId() + ")");
+                upperclassmen.remove(s);
             }
         }
-        Bag upperclassmen = students;
         
         for(int x=0;x<upperclassmen.size();x++){
             Student s = (Student) upperclassmen.get(x);
@@ -127,6 +125,9 @@ public class UpperclassHousingSelection{
             if(!s.hasRoom()){
                 System.out.println(s + " has no upperclass dorm room!");
             }
+else {
+System.out.println(s + " in dorm " + s.getDormRoom() + ".");
+}
         }
     }
 
@@ -148,8 +149,8 @@ public class UpperclassHousingSelection{
             //need to leave current room so that they can get a new room
             s.leaveRoom();
             if(s.getRace() == Student.Race.MINORITY){
-                double rollDice=random.nextDouble();
-                if(rollDice<CHANCE_DUAL_MINORITY){
+                double rollDice=Sim.instance().random.nextDouble();
+                if(rollDice<Sim.PROB_DUAL_MINORITY){
                     for(int m=0;m<upperclassmen.size();m++){
                         Student r = (Student) upperclassmen.get(m);
                         // if the potential roommate is the same gender, is a 
@@ -198,7 +199,7 @@ public class UpperclassHousingSelection{
                         assignStudent(s);
                     }
                 }else{
-                    //dice roll not under CHANCE_DUAL_MINORITY
+                    //dice roll not under PROB_DUAL_MINORITY
                     assignStudent(s);
                 }
 

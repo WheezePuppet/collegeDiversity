@@ -178,10 +178,17 @@ public class Student implements Steppable{
 
     /**
      * Perform monthly activities for this student. In particular:
-     * <ul>
-     * <li>Assign all upperclassmen to dorms.</li>
-     * <li>Increment the academic year.</li>
-     * </ul>
+     * <ol>
+     * <li>On Sept. 1st, assign a dorm room, classes (TODO), and, if 
+     * freshman (TODO), an orientation group.</li>
+     * <li>On Oct., Nov., Dec., Jan., Feb., Mar., Apr., May 1st, possibly
+     * encounter (and possibly form connections with) other students.</li>
+     * <li>On May 1st., increment the academic year, and possibly drop out
+     * or graduate.</li>
+     * <li>On Jun., Jul., Aug. 1st, do nothing (when performing year-end
+     * activities on May 1st, this object will be scheduled for four months
+     * away, on Sept. 1st, instead of one month away.</li>
+     * </ol>
      */
     public void step(SimState state){
         if (isSeptember(state.schedule.getTime())) {
@@ -195,7 +202,8 @@ public class Student implements Steppable{
 
     private void performYearBeginningActivities() {
 
-        //Dorm encounters - student has a chance to connect with every single person in the dorm (not realistic)
+        //Dorm encounters - student has a chance to connect with every 
+        // single person in the dorm (not realistic)
         Dorm d = dormRoom.getDorm();
         for(int x=0;x<d.getNumRooms();x++){
             if(!(d.getRoomByIndex(x)==this.dormRoom)){
@@ -227,19 +235,16 @@ public class Student implements Steppable{
             }
         }
 
+        // Schedule again for next month.
+        Sim.instance().schedule.scheduleOnceIn(1/12.0,this);
     }
 
     private void performYearEndingActivities() {
-        try{
-            PrintWriter out = new PrintWriter(new FileWriter(
-                Sim.OUTPUT_DIRECTORY + File.separator + "year" + 
-                Sim.instance().getYear() + ".csv", true)); 
-            out.println(this); 
-            out.close();
-        }catch(java.io.IOException e){ e.printStackTrace();}
         this.grade++;
         if(!graduateOrDropout()){
-            Sim.instance().schedule.scheduleOnceIn(1,this);
+            // Skip ahead four months and schedule again for Sept. 1st 
+            //   (start of fall semester but after Aug 1st schedule point.)
+            Sim.instance().schedule.scheduleOnceIn(4/12.0,this);
         }
     }
 
@@ -248,11 +253,15 @@ public class Student implements Steppable{
         //Random encounters
         for(int x=0;x<Sim.NUM_ANNUAL_RANDOM_ENCOUNTERS;x++){
             Student meetMe = Sim.instance().getRandomStudent();
-            if(this!=meetMe && !(met.contains(meetMe)) && !(connections.contains(meetMe))){
+            if(this!=meetMe && !(met.contains(meetMe)) && 
+                !(connections.contains(meetMe))){
+
                 encounter(meetMe);
             }else{x--;}
-
         }
+
+        // Schedule again for next month.
+        Sim.instance().schedule.scheduleOnceIn(1/12.0,this);
     }
 
     private void encounter(Student s2){
@@ -369,7 +378,6 @@ public class Student implements Steppable{
         // remove from the Sim's bag
         // remove from all friends' connections
         // remove from all groups, etc.,
-        //System.out.println("Student's grade is "+ grade);
         if(grade==5){
             //graduate
 

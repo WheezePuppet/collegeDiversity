@@ -108,7 +108,7 @@ public class FreshmanHousingSelection{
             if(s.hasRoom()){continue;}
             if(s.getRace() == Student.Race.MINORITY){
                 double rollDice=Sim.instance().random.nextDouble();
-                if(rollDice<Sim.CHANCE_DUAL_MINORITY){
+                if(rollDice<Sim.PROB_DUAL_MINORITY){
                     for(int m=0;m<newFreshmen.size();m++){
                         Student r = (Student) newFreshmen.get(m);
                         if(r.getId()==s.getId()){continue;}
@@ -159,7 +159,7 @@ public class FreshmanHousingSelection{
                         assignStudent(s);
                     }
                 }else{
-                    //dice roll not under CHANCE_DUAL_MINORITY
+                    //dice roll not under PROB_DUAL_MINORITY
                     assignStudent(s);
                 }
 
