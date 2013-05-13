@@ -54,13 +54,13 @@ public class Student implements Steppable{
     private double weightGpa;
     private double weightRace;
 
-    ArrayList<Group> groups;
-    ArrayList<Student> connections;
-    ArrayList<Integer> attributes;
+    private ArrayList<Group> groups;
+    private ArrayList<Student> connections;
+    private ArrayList<Integer> attributes;
 
     // People who this student has previously met (and may or may not have
-    // formed a connection with?)
-    ArrayList<Student> met;
+    // formed a connection with.)
+    private ArrayList<Student> met;
 
 
     // Should only be instantiated by FreshmanFactory.
@@ -181,13 +181,15 @@ public class Student implements Steppable{
      * <ol>
      * <li>On Sept. 1st, assign a dorm room, classes (TODO), and, if 
      * freshman (TODO), an orientation group.</li>
-     * <li>On Oct., Nov., Dec., Jan., Feb., Mar., Apr., May 1st, possibly
+     * <li>On Oct., Nov., Dec., Jan., Feb., Mar., Apr. 1st, possibly
      * encounter (and possibly form connections with) other students.</li>
      * <li>On May 1st., increment the academic year, and possibly drop out
-     * or graduate.</li>
+     * or graduate. (Note that the {@link StatsPrinter} will run on April
+     * 30th, just before this promotion activity, to dump out stats for the
+     * just-now-ending academic year's students.)</li>
      * <li>On Jun., Jul., Aug. 1st, do nothing (when performing year-end
      * activities on May 1st, this object will be scheduled for four months
-     * away, on Sept. 1st, instead of one month away.</li>
+     * away, on Sept. 1st, instead of one month away).</li>
      * </ol>
      */
     public void step(SimState state){
@@ -250,8 +252,14 @@ public class Student implements Steppable{
 
     private void performMonthlyActivities(){
 
+        if (Sim.instance().getNumStudents() - met.size() <
+            Sim.NUM_ANNUAL_RANDOM_ENCOUNTERS/8) {
+            // There's not enough people left to meet! Get outta here.
+            return;
+        }
+
         //Random encounters
-        for(int x=0;x<Sim.NUM_ANNUAL_RANDOM_ENCOUNTERS;x++){
+        for(int x=0;x<(Sim.NUM_ANNUAL_RANDOM_ENCOUNTERS/8);x++){
             Student meetMe = Sim.instance().getRandomStudent();
             if(this!=meetMe && !(met.contains(meetMe)) && 
                 !(connections.contains(meetMe))){
@@ -265,16 +273,29 @@ public class Student implements Steppable{
     }
 
     private void encounter(Student s2){
-        double similarity = (similarityTo(s2))-MIN_SIMILARITY;
-        double probConnection = (Sim.HIGH_PROB_RANDOM_CONNECTION-Sim.LOW_PROB_RANDOM_CONNECTION)*(similarity/MAX_SIMILARITY)+Sim.LOW_PROB_RANDOM_CONNECTION;
-        if(probConnection>.6){
-            probConnection=.6;
+
+        if (!met.contains(s2)) {
+            met.add(s2);
+            s2.met.add(this);
         }
-        if(probConnection<.2){
-            probConnection=.2;
+
+        double similarity = similarityTo(s2) - MIN_SIMILARITY;
+
+        double probConnection = 
+            (Sim.HIGH_PROB_RANDOM_CONNECTION-Sim.LOW_PROB_RANDOM_CONNECTION) *
+                (similarity/MAX_SIMILARITY) + Sim.LOW_PROB_RANDOM_CONNECTION;
+
+        if(probConnection>Sim.HIGH_PROB_RANDOM_CONNECTION){
+            probConnection=Sim.HIGH_PROB_RANDOM_CONNECTION;
         }
+
+        if(probConnection<Sim.LOW_PROB_RANDOM_CONNECTION){
+            probConnection=Sim.LOW_PROB_RANDOM_CONNECTION;
+        }
+
         double formConnection = Sim.instance().random.nextDouble();
-        if(formConnection<probConnection){
+
+        if(formConnection < probConnection){
             connections.add(s2);
             s2.connections.add(this);
         }
@@ -404,7 +425,7 @@ public class Student implements Steppable{
      * output file to collect statistics.
      */
     public String toString() {
-        return id + ","+race + ",year" + grade + "," + connections.size();
+        return id + ","+race + "," + grade + "," + connections.size();
     }
 
     /**

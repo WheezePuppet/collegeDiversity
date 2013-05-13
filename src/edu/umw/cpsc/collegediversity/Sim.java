@@ -17,16 +17,24 @@ import java.io.*;
  * <li>The {@link FreshmanFactory} runs once every August 1st,
  * instantiating new Student objects to represent that year's crop of
  * freshmen.</li>
- * <li>{@link Student}s are scheduled to run every September 1st. (They're
- * scheduled by the {@link FreshmanFactory} to run the first Sept., and
- * then each year they schedule themselves again for following Sept. unless
- * they graduate or dropout.)</li>
+ * <li>{@link Student}s are scheduled to run on the first of every month. 
+ * (They're scheduled by the {@link FreshmanFactory} to run the first Sept., 
+ * and then each month they schedule themselves again for following month;
+ * see {@link Student#step} for details.)</li>
+ * <li>The {@link StatsPrinter} object will run every April 30th, which is
+ * after Students' last activity of the year but before they promote
+ * themselves (and/or dropout or graduate) on May 1st.</li>
  * <li>This object itself will run once per year, on June 1st, promoting all
  * students who haven't dropped out, and assigning them to next year's
  * dorms.</li>
  * </ul>
  */
 public class Sim extends SimState implements Steppable {
+
+    /**
+     * The number of years the simulation will run.
+     */
+    public final static int NUM_SIM_YEARS = 5;
 
     /**
      * The number of new freshmen entering the University each year.
@@ -119,13 +127,13 @@ public class Sim extends SimState implements Steppable {
      * The probability of two <i>completely dissimilar</i> students forming
      * a connection if they randomly encounter each other.
      */
-    public static final double LOW_PROB_RANDOM_CONNECTION = .2; 
+    public static final double LOW_PROB_RANDOM_CONNECTION = .002; 
 
     /**
      * The probability of two <i>"perfectly" similar</i> students forming
      * a connection if they randomly encounter each other.
      */
-    public static final double HIGH_PROB_RANDOM_CONNECTION = .6;
+    public static final double HIGH_PROB_RANDOM_CONNECTION = .006;
 
     /**
      * The number of "random" encounters (<i>i.e.</i>, outside the context
@@ -248,6 +256,10 @@ public class Sim extends SimState implements Steppable {
         // Schedule the FreshmanFactory to run each August 1st.
         schedule.scheduleOnce(Schedule.EPOCH + 1, FreshmanFactory.instance());
 
+        // Schedule the StatsPrinter to run each April 30th.
+        schedule.scheduleOnce(Schedule.EPOCH + 1 + 271/365.0, 
+            StatsPrinter.instance());
+
         // Schedule this simulation object to run each June 1st, starting
         //  with *next* June.
         schedule.scheduleOnce(Schedule.EPOCH + 1 + 10/12.0,this);
@@ -258,7 +270,6 @@ public class Sim extends SimState implements Steppable {
      * every June 1st. In particular:
      * <ul>
      * <li>Assign all upperclassmen to dorms.</li>
-     * <li>Print statistical output.</li>
      * <li>Increment the academic year.</li>
      * </ul>
      */
@@ -267,16 +278,11 @@ public class Sim extends SimState implements Steppable {
             " completed!!!");
         UpperclassHousingSelection.instance().assign(enrolledStudents);
         academicYear++;
-        try{
-            PrintWriter out = new PrintWriter(new FileWriter(
-                OUTPUT_DIRECTORY + File.separator + "year" + 
-                getYear() + ".csv", true)); 
-            int numStudents = enrolledStudents.size();
-            for (int i=0; i<numStudents; i++) {
-                out.println(enrolledStudents.get(i)); 
-            }
-            out.close();
-        }catch(java.io.IOException e){ e.printStackTrace();}
+
+        if (academicYear - 2013 >= NUM_SIM_YEARS) {
+            System.exit(1);
+        }
+
         state.schedule.scheduleOnceIn(1,this);
     }
 
@@ -304,6 +310,10 @@ public class Sim extends SimState implements Steppable {
      */
     public int getNumStudents() {
         return enrolledStudents.size();
+    }
+
+    Bag getStudents() {
+        return enrolledStudents;
     }
 
     /**
