@@ -19,8 +19,9 @@ public class Dorm extends Group {
      * Constructor for new Dorm objects.
      * @param name the name of this Dorm, which should be unique across all 
      * dorms (though this is not enforced.)
-     * @param femaleOnly is this dorm intended to allow only female 
-     * occupants?
+     * @param femaleOnly does this dorm have only female rooms? 
+     * (<code>false</code> means it has both male-only rooms and female-only 
+     * rooms.)
      * @param freshmanOnly is this dorm intended to allow only freshman
      * occupants?
      * @param numRooms the number of rooms in the dorm.
