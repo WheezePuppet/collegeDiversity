@@ -14,7 +14,6 @@ public class Room {
     private int roomNum;
     private int occupancy = Sim.DORM_ROOM_SIZE;
     private Bag occupants;
-    private boolean dualMinority;
     private boolean femaleRoom;
 
 
@@ -23,19 +22,16 @@ public class Room {
      * @param dorm the enclosing dorm room.
      * @param roomNum the number of this room, which should be unique
      * within its enclosing dorm (though this is not enforced).
-     * @param dualMinority  ??? TODO
      * @param femaleRoom does this room allow only female occupants? If
      * false, it allows only <i>male</i> occupants. (Mixed-gender rooms do
      * not exist.)
      */
-    public Room(Dorm dorm, int roomNum, boolean dualMinority,
-        boolean femaleRoom){
+    public Room(Dorm dorm, int roomNum, boolean femaleRoom){
 
         occupants = new Bag();
 
         this.dorm = dorm;
         this.roomNum = roomNum;
-        this.dualMinority = dualMinority;
         this.femaleRoom = femaleRoom;
     }
 
@@ -111,16 +107,7 @@ public class Room {
         if(occupants.size()==0){
             //if person is correct race to be in this room (dual minority 
             //  rooms must have 2 minorities)
-            if(dualMinority){//need to check for race before adding student
-                if(s.getRace()==Student.Race.MINORITY){
-                    s.setRoom(this);
-                }else{
-                    throw new IllegalArgumentException(
-                        "resident not correct race for this room");
-                }
-            }else{//do not need to check for race
-                s.setRoom(this);
-            }
+            s.setRoom(this);
             if(s.getGender()==Student.Gender.MALE){
                 femaleRoom=false;
             }else{
@@ -130,25 +117,11 @@ public class Room {
 
             //room has only one out of two residents
             
-            if(dualMinority){//need to check for race before adding student
-                if(s.getRace()==Student.Race.MINORITY){
-                    //if the person is the correct gender for this room
-                    if((s.getGender()==Student.Gender.FEMALE && femaleRoom)
-                        ||
-                        (s.getGender()==Student.Gender.FEMALE && !femaleRoom)){
-                        s.setRoom(this);
-                    }
-                }else{
-                    throw new IllegalArgumentException(
-                        "resident not correct race for this room");
-                }
-            } else {//do not need to check for race
-                //if the person is the correct gender for this room
-                if((s.getGender()==Student.Gender.FEMALE && femaleRoom)
-                    ||
-                    (s.getGender()==Student.Gender.MALE && !femaleRoom)){
-                    s.setRoom(this);
-                }
+            //if the person is the correct gender for this room
+            if((s.getGender()==Student.Gender.FEMALE && femaleRoom)
+                ||
+                (s.getGender()==Student.Gender.MALE && !femaleRoom)){
+                s.setRoom(this);
             }
         }else{
             throw new IllegalArgumentException(

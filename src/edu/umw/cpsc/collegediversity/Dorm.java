@@ -14,10 +14,6 @@ public class Dorm extends Group {
     private Room[] rooms;
     private String name;
 
-    /**
-     * TODO ????
-     */
-    public static final double CHANCE_DUAL_MINORITY = .00;
 
     /**
      * Constructor for new Dorm objects.
@@ -39,14 +35,7 @@ public class Dorm extends Group {
         rooms = new Room[numRooms];
 
         for(int i=0; i<numRooms; i++){
-            boolean dualMinority;
-            float dualMinPercent = Sim.instance().random.nextFloat();
-            if(dualMinPercent>CHANCE_DUAL_MINORITY){
-                dualMinority = false;
-            }else{
-                dualMinority = true; 
-            }
-            rooms[i]= new Room(this, i, dualMinority, femaleOnly);
+            rooms[i]= new Room(this, i, femaleOnly);
         }
     }
 
